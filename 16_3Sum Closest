@@ -1,0 +1,36 @@
+class Solution(object):
+    def threeSumClosest(self, nums, target):
+        """
+        :type nums: List[int]
+        :type target: int
+        :rtype: int
+        """
+        # Sort the array to enable two-pointer technique
+        nums.sort()
+        n = len(nums)
+        closest_sum = float('inf')
+        
+        # Iterate through each element as the first element of triplet
+        for i in range(n - 2):
+            # Use two pointers for the remaining two elements
+            left = i + 1
+            right = n - 1
+            
+            while left < right:
+                current_sum = nums[i] + nums[left] + nums[right]
+                
+                # If current sum is closer to target, update closest_sum
+                if abs(current_sum - target) < abs(closest_sum - target):
+                    closest_sum = current_sum
+                
+                # If we found exact match, return immediately
+                if current_sum == target:
+                    return current_sum
+                elif current_sum < target:
+                    # Need larger sum, move left pointer right
+                    left += 1
+                else:
+                    # Need smaller sum, move right pointer left
+                    right -= 1
+        
+        return closest_sum
