@@ -25,3 +25,6 @@ class Solution(object):
                 prev_end = end
 
         return count
+
+# Time Complexity: O(nlogn), where n is the number of intervals
+# Space Complexity: O(1)
