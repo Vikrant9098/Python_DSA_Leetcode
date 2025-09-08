@@ -31,3 +31,4 @@ class Solution(object):
             total_ratio += float(passi) / totali   # add its pass ratio
         
         return total_ratio / len(classes)  # divide by number of classes
+1317. Convert Integer to the Sum of Two No-Zero Integers
