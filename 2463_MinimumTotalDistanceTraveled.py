@@ -1,38 +1,46 @@
-class Solution(object):
+class Solution:
     def minimumTotalDistance(self, robot, factory):
-        """
-        :type robot: List[int]
-        :type factory: List[List[int]]
-        :rtype: int
-        """
-        # Sort robots and factories based on positions
+        # Sort robots and factories by position
         robot.sort()
         factory.sort()
 
-        # Expand factory positions based on capacity
-        factory_positions = []
-        for f in factory:
-            for i in range(f[1]):
-                factory_positions.append(f[0])  # repeat position as per capacity
+        n = len(robot)      # number of robots
+        m = len(factory)    # number of factories
 
-        # Start recursion from first robot and first factory
-        return self._calculate_min_distance(0, 0, robot, factory_positions)
+        INF = 10**18        # large value to represent impossible cases
 
-    def _calculate_min_distance(self, robot_idx, factory_idx, robot, factory_positions):
-        # If all robots are assigned, no more distance needed
-        if robot_idx == len(robot):
-            return 0
+        # dp[i][j] = minimum distance to fix first i robots using first j factories
+        dp = [[INF] * (m + 1) for _ in range(n + 1)]
 
-        # If no factories left but robots remain → invalid case
-        if factory_idx == len(factory_positions):
-            return 1e12  # large number to avoid choosing this path
+        # Base case: 0 robots → 0 distance regardless of factories
+        for j in range(m + 1):
+            dp[0][j] = 0
 
-        # Option 1: Assign current robot to current factory
-        assign = abs(robot[robot_idx] - factory_positions[factory_idx]) + \
-                 self._calculate_min_distance(robot_idx + 1, factory_idx + 1, robot, factory_positions)
+        # Iterate over factories
+        for j in range(1, m + 1):
+            pos, limit = factory[j - 1]  # current factory position & capacity
 
-        # Option 2: Skip current factory position
-        skip = self._calculate_min_distance(robot_idx, factory_idx + 1, robot, factory_positions)
+            # Iterate over number of robots
+            for i in range(n + 1):
 
-        # Return minimum of both choices
-        return min(assign, skip)
+                # Option 1: skip this factory
+                dp[i][j] = dp[i][j - 1]
+
+                # Try assigning k robots to this factory (1 to limit)
+                dist = 0  # cumulative distance for k robots
+
+                for k in range(1, limit + 1):
+                    if i - k < 0:
+                        break  # not enough robots to assign
+
+                    # Add distance of assigning (i-k)th robot to current factory
+                    dist += abs(robot[i - k] - pos)
+
+                    # Option 2: assign k robots to this factory
+                    dp[i][j] = min(
+                        dp[i][j],
+                        dp[i - k][j - 1] + dist  # previous + current assignment cost
+                    )
+
+        # Final answer: all robots using all factories
+        return dp[n][m]
